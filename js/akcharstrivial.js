@@ -57,7 +57,32 @@ $(document).ready(() => {
 
         console.log("op_dict:", op_dict)
 
+        const dict = db.handbookInfo.handbookDict
+
         // Populate height
+        const heights = new Map();
+        for (const [key, value] of Object.entries(dict)) {
+            const basic_info = value.storyTextAudio[0].stories[0].storyText.split("\n")
+            for (let i=0; i<basic_info.length; ++i) {
+                if (basic_info[i].trimStart().startsWith("【身高】") === true) {
+                    const height = basic_info[i].trim().slice(4)//.replace("cm","").replace("左右","")
+                    const parsed = parseInt(height)
+                    if (!Number.isNaN(parsed)) {
+                        heights.set(key, parsed)
+                    } else {
+                        //console.log("dropped height:", height)
+                    }
+                    break
+                }
+            }
+        }
+        const heights_asc = new Map([...heights.entries()].sort((a, b) => a[1] - b[1]));
+
+        //console.log("heights:", heights)
+        //console.log("heights_asc:", heights_asc)
+        for (const [key, value] of heights_asc) {
+            console.log(op_dict[key].name_en, ":", value);
+        }
 
         // Populate combat experience
 
@@ -66,7 +91,7 @@ $(document).ready(() => {
         // Populate faction
 
         // Populate birthdates
-        const dict = db.handbookInfo.handbookDict
+        
         for (const [key, value] of Object.entries(dict)) {
             const basic_info = value.storyTextAudio[0].stories[0].storyText.split("\n")
             for (let i=0; i<basic_info.length; ++i) {
@@ -93,7 +118,7 @@ $(document).ready(() => {
                 }
             }
         }
-        console.log("birth:", birth)
+        //console.log("birth:", birth)
         //CreateBirthdayTables(birth)
 
         $.holdReady(false)
